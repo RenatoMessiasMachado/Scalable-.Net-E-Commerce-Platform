@@ -398,17 +398,4 @@ Este projeto está sob a licença MIT.
 
 Para questões e suporte:
 - Abra uma issue no GitHub
-- Email: support@example.com
-
-## 🗺️ Roadmap
-
-- [ ] Implementar Circuit Breaker (Polly)
-- [ ] Adicionar GraphQL API
-- [ ] Implementar CQRS pattern
-- [ ] Adicionar Kubernetes Helm Charts
-- [ ] Implementar Distributed Tracing (Jaeger)
-- [ ] Adicionar API Versioning
-- [ ] Implementar Rate Limiting
-- [ ] Adicionar Metrics (Prometheus)
-- [ ] Implementar OAuth2/OpenID Connect
-- [ ] Adicionar Frontend React/Angular
+- Email: renato19mm@gmail.com
