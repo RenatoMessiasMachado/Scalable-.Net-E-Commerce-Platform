@@ -1,0 +1,275 @@
+version: '3.8'
+
+services:
+  # ==================== Infrastructure Services ====================
+  
+  # PostgreSQL - User Service Database
+  userdb:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - userdb_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  # PostgreSQL - Product Catalog Database
+  productdb:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5433:5432"
+    volumes:
+      - productdb_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  # PostgreSQL - Order Service Database
+  orderdb:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5434:5432"
+    volumes:
+      - orderdb_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  # Redis - Shopping Cart & Caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ecommerce-network
+
+  # RabbitMQ - Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ecommerce-network
+
+  # Consul - Service Discovery
+  consul:
+    image: consul:latest
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    networks:
+      - ecommerce-network
+
+  # Elasticsearch - Centralized Logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - ecommerce-network
+
+  # Kibana - Log Visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - ecommerce-network
+
+  # ==================== Microservices ====================
+
+  # User Service
+  user-service:
+    build:
+      context: ./src/UserService
+      dockerfile: Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=userdb;Database=userdb;Username=postgres;Password=postgres123
+      - JWT__Secret=SuperSecretKey123456789SuperSecretKey123456789
+      - JWT__Issuer=EcommerceAPI
+      - JWT__Audience=EcommerceClient
+      - Consul__Host=consul
+      - Consul__Port=8500
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+    depends_on:
+      - userdb
+      - consul
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
+  # Product Catalog Service
+  product-service:
+    build:
+      context: ./src/ProductService
+      dockerfile: Dockerfile
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=productdb;Database=productdb;Username=postgres;Password=postgres123
+      - Consul__Host=consul
+      - Consul__Port=8500
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+      - Redis__Configuration=redis:6379
+    depends_on:
+      - productdb
+      - consul
+      - rabbitmq
+      - redis
+    networks:
+      - ecommerce-network
+
+  # Shopping Cart Service
+  cart-service:
+    build:
+      context: ./src/CartService
+      dockerfile: Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Redis__Configuration=redis:6379
+      - Consul__Host=consul
+      - Consul__Port=8500
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+    depends_on:
+      - redis
+      - consul
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
+  # Order Service
+  order-service:
+    build:
+      context: ./src/OrderService
+      dockerfile: Dockerfile
+    ports:
+      - "5004:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=orderdb;Database=orderdb;Username=postgres;Password=postgres123
+      - Consul__Host=consul
+      - Consul__Port=8500
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+    depends_on:
+      - orderdb
+      - consul
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./src/PaymentService
+      dockerfile: Dockerfile
+    ports:
+      - "5005:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Consul__Host=consul
+      - Consul__Port=8500
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+      - Stripe__SecretKey=sk_test_your_stripe_key_here
+      - Stripe__PublishableKey=pk_test_your_stripe_key_here
+    depends_on:
+      - consul
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./src/NotificationService
+      dockerfile: Dockerfile
+    ports:
+      - "5006:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Consul__Host=consul
+      - Consul__Port=8500
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=admin
+      - RabbitMQ__Password=admin123
+      - SendGrid__ApiKey=your_sendgrid_api_key_here
+      - Twilio__AccountSid=your_twilio_account_sid
+      - Twilio__AuthToken=your_twilio_auth_token
+      - Twilio__PhoneNumber=your_twilio_phone_number
+    depends_on:
+      - consul
+      - rabbitmq
+    networks:
+      - ecommerce-network
+
+  # API Gateway (NGINX)
+  api-gateway:
+    build:
+      context: ./src/ApiGateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - user-service
+      - product-service
+      - cart-service
+      - order-service
+      - payment-service
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  userdb_data:
+  productdb_data:
+  orderdb_data:
+  redis_data:
+  rabbitmq_data:
+  elasticsearch_data:
