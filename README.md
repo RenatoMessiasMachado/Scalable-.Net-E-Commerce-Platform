@@ -1,113 +1,113 @@
 # E-commerce Microservices Platform - .NET Core
 
-Uma plataforma e-commerce escalável construída com arquitetura de microserviços usando .NET Core 8, Docker e tecnologias modernas.
+A scalable e-commerce platform built with microservices architecture using .NET Core 8, Docker, and modern technologies.
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
-### Microserviços
+### Microservices
 
-1. **User Service** (Porta 5001)
-   - Autenticação e autorização com JWT
-   - Gerenciamento de perfil de usuário
-   - PostgreSQL para persistência
-   - Publica eventos de registro de usuário
+1. **User Service** (Port 5001)
+   - JWT authentication and authorization
+   - User profile management
+   - PostgreSQL persistence
+   - Publishes user registration events
 
-2. **Product Catalog Service** (Porta 5002)
-   - Gerenciamento de catálogo de produtos
-   - Pesquisa e filtros de produtos
-   - Cache Redis para melhor performance
-   - PostgreSQL para persistência
+2. **Product Catalog Service** (Port 5002)
+   - Product catalog management
+   - Product search and filtering
+   - Redis cache for improved performance
+   - PostgreSQL persistence
 
-3. **Shopping Cart Service** (Porta 5003)
-   - Gerenciamento de carrinho de compras
-   - Armazenamento em Redis (session-based)
-   - Adicionar/remover/atualizar itens
+3. **Shopping Cart Service** (Port 5003)
+   - Shopping cart management
+   - Redis-based storage (session-based)
+   - Add/remove/update items
 
-4. **Order Service** (Porta 5004)
-   - Processamento de pedidos
-   - Histórico de pedidos
-   - Rastreamento de status
-   - PostgreSQL para persistência
-   - Publica eventos de criação de pedido
+4. **Order Service** (Port 5004)
+   - Order processing
+   - Order history
+   - Status tracking
+   - PostgreSQL persistence
+   - Publishes order creation events
 
-5. **Payment Service** (Porta 5005)
-   - Integração com Stripe
-   - Processamento de pagamentos
-   - Publica eventos de pagamento processado
+5. **Payment Service** (Port 5005)
+   - Stripe integration
+   - Payment processing
+   - Publishes payment processed events
 
-6. **Notification Service** (Porta 5006)
-   - Envio de e-mails (SendGrid)
-   - Envio de SMS (Twilio)
-   - Consome eventos de outros serviços
+6. **Notification Service** (Port 5006)
+   - Email delivery (SendGrid)
+   - SMS delivery (Twilio)
+   - Consumes events from other services
 
-### Componentes de Infraestrutura
+### Infrastructure Components
 
-- **API Gateway** (NGINX) - Porta 8080
-  - Ponto de entrada único para clientes
-  - Roteamento para microserviços
+- **API Gateway** (NGINX) - Port 8080
+  - Single entry point for clients
+  - Routing to microservices
   - Load balancing
 
-- **Service Discovery** (Consul) - Porta 8500
-  - Registro automático de serviços
+- **Service Discovery** (Consul) - Port 8500
+  - Automatic service registration
   - Health checks
-  - Service discovery dinâmico
+  - Dynamic service discovery
 
-- **Message Broker** (RabbitMQ) - Porta 5672, 15672
-  - Comunicação assíncrona entre serviços
+- **Message Broker** (RabbitMQ) - Ports 5672, 15672
+  - Asynchronous communication between services
   - Event-driven architecture
-  - Management UI disponível
+  - Management UI available
 
-- **Cache** (Redis) - Porta 6379
-  - Cache de produtos
-  - Armazenamento de carrinho de compras
+- **Cache** (Redis) - Port 6379
+  - Product caching
+  - Shopping cart storage
   - Session management
 
 - **Centralized Logging** (ELK Stack)
-  - Elasticsearch - Porta 9200
-  - Kibana - Porta 5601
-  - Agregação de logs de todos os serviços
+  - Elasticsearch - Port 9200
+  - Kibana - Port 5601
+  - Log aggregation from all services
 
 - **Databases** (PostgreSQL)
-  - User Database - Porta 5432
-  - Product Database - Porta 5433
-  - Order Database - Porta 5434
+  - User Database - Port 5432
+  - Product Database - Port 5433
+  - Order Database - Port 5434
 
-## 🚀 Começando
+## 🚀 Getting Started
 
-### Pré-requisitos
+### Prerequisites
 
 - Docker 20.10+
 - Docker Compose 2.0+
-- .NET 8 SDK (para desenvolvimento local)
+- .NET 8 SDK (for local development)
 - Git
 
-### Configuração Inicial
+### Initial Setup
 
-1. **Clone o repositório:**
+1. **Clone the repository:**
 ```bash
-git clone <repository-url>
+git clone 
 cd ecommerce-platform
 ```
 
-2. **Configure as variáveis de ambiente:**
+2. **Configure environment variables:**
 
-Edite o `docker-compose.yml` e atualize:
+Edit `docker-compose.yml` and update:
 - Stripe API keys (PaymentService)
 - SendGrid API key (NotificationService)
 - Twilio credentials (NotificationService)
 
-3. **Construa e inicie os serviços:**
+3. **Build and start services:**
 ```bash
 docker-compose build
 docker-compose up -d
 ```
 
-4. **Verifique os serviços:**
+4. **Verify services:**
 ```bash
 docker-compose ps
 ```
 
-### Acessando os Serviços
+### Accessing Services
 
 - **API Gateway**: http://localhost:8080
 - **User Service**: http://localhost:5001/swagger
@@ -120,9 +120,9 @@ docker-compose ps
 - **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
 - **Kibana**: http://localhost:5601
 
-## 📋 Exemplos de API
+## 📋 API Examples
 
-### 1. Registrar Usuário
+### 1. Register User
 
 ```bash
 curl -X POST http://localhost:8080/api/users/register \
@@ -132,7 +132,7 @@ curl -X POST http://localhost:8080/api/users/register \
     "email": "john@example.com",
     "password": "password123",
     "phoneNumber": "+5511999999999",
-    "address": "Rua Example, 123"
+    "address": "123 Main Street"
   }'
 ```
 
@@ -147,7 +147,7 @@ curl -X POST http://localhost:8080/api/users/login \
   }'
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "userId": "guid",
@@ -157,19 +157,19 @@ curl -X POST http://localhost:8080/api/users/login \
 }
 ```
 
-### 3. Listar Produtos
+### 3. List Products
 
 ```bash
 curl http://localhost:8080/api/products
 ```
 
-### 4. Buscar Produto Específico
+### 4. Get Specific Product
 
 ```bash
 curl http://localhost:8080/api/products/{productId}
 ```
 
-### 5. Adicionar ao Carrinho
+### 5. Add to Cart
 
 ```bash
 curl -X POST http://localhost:8080/api/cart/{userId}/items \
@@ -182,13 +182,13 @@ curl -X POST http://localhost:8080/api/cart/{userId}/items \
   }'
 ```
 
-### 6. Ver Carrinho
+### 6. View Cart
 
 ```bash
 curl http://localhost:8080/api/cart/{userId}
 ```
 
-### 7. Criar Pedido
+### 7. Create Order
 
 ```bash
 curl -X POST http://localhost:8080/api/orders \
@@ -205,32 +205,32 @@ curl -X POST http://localhost:8080/api/orders \
       }
     ],
     "totalAmount": 1499.99,
-    "shippingAddress": "Rua Example, 123"
+    "shippingAddress": "123 Main Street"
   }'
 ```
 
-## 🔄 Fluxo de Eventos
+## 🔄 Event Flow
 
-### Criação de Pedido
+### Order Creation Flow
 ```
 1. User Service → UserRegisteredEvent
 2. Order Service → OrderCreatedEvent
 3. Payment Service → PaymentProcessedEvent
 4. Order Service → OrderShippedEvent
-5. Notification Service → Consome todos os eventos e envia notificações
+5. Notification Service → Consumes all events and sends notifications
 ```
 
-## 📊 Monitoramento e Logs
+## 📊 Monitoring and Logging
 
-### Visualizar Logs no Kibana
+### View Logs in Kibana
 
-1. Acesse http://localhost:5601
-2. Configure o index pattern: `ecommerce-*`
-3. Explore os logs de todos os microserviços
+1. Access http://localhost:5601
+2. Configure index pattern: `ecommerce-*`
+3. Explore logs from all microservices
 
-### Verificar Health Checks
+### Check Health Status
 
-Cada serviço expõe um endpoint `/health`:
+Each service exposes a `/health` endpoint:
 
 ```bash
 curl http://localhost:5001/health  # User Service
@@ -240,85 +240,85 @@ curl http://localhost:5002/health  # Product Service
 
 ### Consul Service Discovery
 
-Visite http://localhost:8500 para ver:
-- Serviços registrados
-- Status de saúde
-- Configurações
+Visit http://localhost:8500 to view:
+- Registered services
+- Health status
+- Configuration
 
-## 🛠️ Desenvolvimento
+## 🛠️ Development
 
-### Executar Localmente (sem Docker)
+### Running Locally (without Docker)
 
-1. **Inicie os serviços de infraestrutura:**
+1. **Start infrastructure services:**
 ```bash
 docker-compose up -d userdb productdb orderdb redis rabbitmq consul elasticsearch kibana
 ```
 
-2. **Configure as connection strings:**
+2. **Configure connection strings:**
 ```bash
 export ConnectionStrings__DefaultConnection="Host=localhost;Database=userdb;Username=postgres;Password=postgres123"
 ```
 
-3. **Execute um serviço:**
+3. **Run a service:**
 ```bash
 cd src/UserService
 dotnet run
 ```
 
-### Adicionar um Novo Microserviço
+### Adding a New Microservice
 
-1. Crie uma nova pasta em `src/`
-2. Adicione referência ao projeto Shared
-3. Implemente health checks
+1. Create a new folder in `src/`
+2. Add reference to the Shared project
+3. Implement health checks
 4. Configure Consul registration
-5. Adicione ao `docker-compose.yml`
-6. Atualize o API Gateway
+5. Add to `docker-compose.yml`
+6. Update the API Gateway
 
-## 🔐 Segurança
+## 🔐 Security
 
-- **JWT Authentication**: Tokens com expiração de 24 horas
-- **Password Hashing**: BCrypt para senhas
-- **HTTPS**: Configure certificados para produção
-- **API Rate Limiting**: Configure no API Gateway
-- **Input Validation**: Data annotations em todos os models
+- **JWT Authentication**: 24-hour token expiration
+- **Password Hashing**: BCrypt for passwords
+- **HTTPS**: Configure certificates for production
+- **API Rate Limiting**: Configure in API Gateway
+- **Input Validation**: Data annotations on all models
 
-## 📈 Escalabilidade
+## 📈 Scalability
 
-### Escalar Horizontalmente
+### Horizontal Scaling
 
 ```bash
-# Escalar Product Service para 3 instâncias
+# Scale Product Service to 3 instances
 docker-compose up -d --scale product-service=3
 ```
 
 ### Load Balancing
 
-O NGINX API Gateway automaticamente distribui requisições entre instâncias.
+The NGINX API Gateway automatically distributes requests across instances.
 
 ### Cache Strategy
 
-- **Product Data**: Cache Redis com TTL de 30 minutos
-- **Shopping Cart**: Redis com TTL de 7 dias
-- **Cache Invalidation**: Automático nas atualizações
+- **Product Data**: Redis cache with 30-minute TTL
+- **Shopping Cart**: Redis with 7-day TTL
+- **Cache Invalidation**: Automatic on updates
 
-## 🧪 Testes
+## 🧪 Testing
 
-### Testes de Integração
+### Integration Tests
 
 ```bash
 cd tests
 dotnet test
 ```
 
-### Teste de Carga
+### Load Testing
 
-Use ferramentas como Apache JMeter ou k6:
+Use tools like Apache JMeter or k6:
 
 ```bash
 k6 run load-test.js
 ```
 
-## 📦 Deploy para Produção
+## 📦 Production Deployment
 
 ### Docker Swarm
 
@@ -335,7 +335,7 @@ kubectl apply -f k8s/
 
 ### CI/CD Pipeline
 
-Exemplo com GitHub Actions:
+Example with GitHub Actions:
 
 ```yaml
 name: CI/CD Pipeline
@@ -353,13 +353,13 @@ jobs:
         run: ./deploy.sh
 ```
 
-## 📝 Estrutura de Pastas
+## 📝 Project Structure
 
 ```
 ecommerce-platform/
 ├── src/
-│   ├── Shared/                 # Código compartilhado
-│   │   ├── Events/            # Eventos de integração
+│   ├── Shared/                 # Shared code
+│   │   ├── Events/            # Integration events
 │   │   ├── Messaging/         # RabbitMQ message bus
 │   │   └── ServiceDiscovery/  # Consul integration
 │   ├── UserService/
@@ -374,19 +374,19 @@ ecommerce-platform/
 └── README.md
 ```
 
-## 🤝 Contribuindo
+## 🤝 Contributing
 
-1. Fork o projeto
-2. Crie uma feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está sob a licença MIT.
+This project is licensed under the MIT License.
 
-## 🙏 Agradecimentos
+## 🙏 Acknowledgments
 
 - .NET Core Team
 - Docker Community
@@ -394,8 +394,8 @@ Este projeto está sob a licença MIT.
 - Consul by HashiCorp
 - Elastic Stack
 
-## 📞 Suporte
+## 📞 Support
 
-Para questões e suporte:
-- Abra uma issue no GitHub
+For questions and support:
+- Open an issue on GitHub
 - Email: renato19mm@gmail.com
